@@ -1,6 +1,6 @@
 use std::io::{Read, Write, Error};
 
-use extsort_lily::{ExternalSorter, ExternallySortable};
+use extsort_lily::{ExternalSorter, Sortable};
 
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
 struct Num {
@@ -13,7 +13,7 @@ impl Num {
   }
 }
 
-impl<W, R> ExternallySortable<W, R> for Num
+impl<W, R> Sortable<W, R> for Num
   where W: Write,
         R: Read,
 {

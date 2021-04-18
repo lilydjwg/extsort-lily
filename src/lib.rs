@@ -1,6 +1,6 @@
 //! An efficient external sort implementation.
 //!
-//! You start by implementing the [`ExternallySortable`] for your data, and provide your data via an
+//! You start by implementing the [`Sortable`] for your data, and provide your data via an
 //! iterable. Then you create a [`ExternalSorter`] to sort data.
 //!
 //! An example is provided in the `examples/` directory.
@@ -14,7 +14,7 @@ use tempdir::TempDir;
 
 mod iter;
 
-pub use iter::{ExtSortedIterator, ExternallySortable};
+pub use iter::{ExtSortedIterator, Sortable};
 
 /// Sort the data
 pub struct ExternalSorter<T> {
@@ -25,7 +25,7 @@ pub struct ExternalSorter<T> {
 
 impl<T> ExternalSorter<T>
 where
-    T: ExternallySortable<BufWriter<File>, BufReader<File>>,
+    T: Sortable<BufWriter<File>, BufReader<File>>,
     T::Error: From<io::Error>,
 {
   /// Create an `ExternalSorter` to sort your data.

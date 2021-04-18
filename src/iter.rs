@@ -4,7 +4,7 @@ use std::io::{Read, Write};
 use std::marker::PhantomData;
 
 /// Implement this trait for data to be sorted
-pub trait ExternallySortable<W: Write, R: Read>: Ord + Sized {
+pub trait Sortable<W: Write, R: Read>: Ord + Sized {
 
   /// Errors that may occur during serialization and deserialization. Note that it needs to
   /// implement `From<std::io::Error>`.
@@ -35,7 +35,7 @@ pub struct ExtSortedIterator<T, R, W> {
 }
 
 impl<T, R, W> ExtSortedIterator<T, R, W>
-  where T: ExternallySortable<W, R>,
+  where T: Sortable<W, R>,
         W: Write, R: Read,
 {
   /// do merge sort on `readers`.
@@ -57,7 +57,7 @@ impl<T, R, W> ExtSortedIterator<T, R, W>
 
 impl<T, R, W> Iterator for ExtSortedIterator<T, R, W>
 where
-    T: super::ExternallySortable<W, R>,
+    T: Sortable<W, R>,
     R: Read,
     W: Write,
 {
