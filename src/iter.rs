@@ -3,6 +3,30 @@ use std::cmp::Reverse;
 use std::io::{Read, Write};
 use std::marker::PhantomData;
 
+/// Implement this trait for data to be sorted
+pub trait ExternallySortable<W: Write, R: Read>: Ord + Sized {
+
+  /// Errors that may occur during serialization and deserialization. Note that it needs to
+  /// implement `From<std::io::Error>`.
+  type Error;
+
+  /// serialize itself and write into the writer.
+  fn serialize(&self, w: &mut W) -> Result<(), Self::Error>;
+
+  /// read data and deserialize.
+  ///
+  /// If no more items to be read, return `None`.
+  fn deserialize(r: &mut R) -> Option<Result<Self, Self::Error>>;
+}
+
+/// The iterator type for producing results sorted by merge sort.
+///
+/// It produces `Result<T, T::Error>`s.
+///
+/// It can fail due to issues reading intermediate sorted chunks from disk, or due to
+/// deserialization issues.
+///
+/// The writer `W` is not actually used by this struct.
 pub struct ExtSortedIterator<T, R, W> {
   tips: BinaryHeap<Reverse<(T, usize)>>,
   readers: Vec<R>,
@@ -10,17 +34,24 @@ pub struct ExtSortedIterator<T, R, W> {
   phantom: PhantomData<W>,
 }
 
-impl<T, R, W> ExtSortedIterator<T, R, W> {
-  pub(crate) fn new(
-    tips: BinaryHeap<Reverse<(T, usize)>>,
-    readers: Vec<R>,
-  ) -> Self {
-    Self {
+impl<T, R, W> ExtSortedIterator<T, R, W>
+  where T: ExternallySortable<W, R>,
+        W: Write, R: Read,
+{
+  /// do merge sort on `readers`.
+  pub fn new(mut readers: Vec<R>) -> Result<Self, T::Error> {
+    let mut tips = BinaryHeap::with_capacity(readers.len());
+    for (idx, r) in readers.iter_mut().enumerate() {
+      let item = T::deserialize(r).unwrap()?;
+      tips.push(Reverse((item, idx)));
+    }
+
+    Ok(Self {
       tips,
       readers,
       failed: false,
       phantom: PhantomData,
-    }
+    })
   }
 }
 
@@ -32,11 +63,6 @@ where
 {
     type Item = Result<T, T::Error>;
 
-    ///
-    /// # Errors
-    ///
-    /// This method can fail due to issues reading intermediate sorted chunks
-    /// from disk, or due to deserialization issues
     fn next(&mut self) -> Option<Self::Item> {
         if self.failed {
             return None;

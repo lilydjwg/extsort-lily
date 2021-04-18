@@ -3,7 +3,9 @@ name = "extsort"
 version = "0.1.0"
 edition = "2018"
 authors = ["lilydjwg <lilydjwg@gmail.com>"]
-license = "MIT"
+license = "BSD-3-Clause"
+description = "An efficient external merge sort implementation."
+documentation = "https://docs.rs/extsort"
 keywords = ["sort", "external", "merge", "mergesort"]
 categories = ["algorithms"]
 
