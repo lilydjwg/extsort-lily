@@ -35,7 +35,7 @@ where
   pub fn new(buffer_n_items: usize) -> io::Result<Self> {
     Ok(ExternalSorter {
       buffer_n_items,
-      tmp_dir: TempDir::new("extsort")?,
+      tmp_dir: TempDir::new("extsort_lily")?,
       phantom: PhantomData,
     })
   }
@@ -46,7 +46,7 @@ where
   ) -> io::Result<Self> {
     Ok(ExternalSorter {
       buffer_n_items,
-      tmp_dir: TempDir::new_in(tmp_dir, "extsort")?,
+      tmp_dir: TempDir::new_in(tmp_dir, "extsort_lily")?,
       phantom: PhantomData,
     })
   }

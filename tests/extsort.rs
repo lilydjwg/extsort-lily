@@ -2,7 +2,7 @@ use std::io::{Read, Write, Error};
 
 use rand;
 
-use extsort::{ExternalSorter, ExternallySortable};
+use extsort_lily::{ExternalSorter, ExternallySortable};
 
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
 struct Num {
