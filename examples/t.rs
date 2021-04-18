@@ -1,5 +1,4 @@
-use std::error::Error;
-use std::io::{Read, Write};
+use std::io::{Read, Write, Error};
 
 use extsort::{ExternalSorter, ExternallySortable};
 
@@ -18,25 +17,24 @@ impl<W, R> ExternallySortable<W, R> for Num
   where W: Write,
         R: Read,
 {
-  fn serialize(&self, w: &mut W) -> Result<(), Box<dyn Error>> {
-    match w.write(&[self.the_num]) {
-      Ok(_) => Ok(()),
-      Err(e) => Err(Box::new(e)),
-    }
+  type Error = Error;
+
+  fn serialize(&self, w: &mut W) -> Result<(), Error> {
+    w.write(&[self.the_num]).map(|_| ())
   }
 
-  fn deserialize(r: &mut R) -> Option<Result<Self, Box<dyn Error>>> {
+  fn deserialize(r: &mut R) -> Option<Result<Self, Error>> {
     let mut buf = [0];
     match r.read(&mut buf) {
       Ok(0) => None,
       Ok(1) => Some(Ok(Self::new(buf[0]))),
-      Err(e) => Some(Err(Box::new(e))),
+      Err(e) => Some(Err(e)),
       _ => unreachable!(),
     }
   }
 }
 
-fn main() -> Result<(), Box<dyn Error>> {
+fn main() -> Result<(), Error> {
   let unsorted = vec![
     Num::new(5),
     Num::new(2),

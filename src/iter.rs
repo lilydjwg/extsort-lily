@@ -1,7 +1,6 @@
 use std::collections::BinaryHeap;
 use std::cmp::Reverse;
 use std::io::{Read, Write};
-use std::error::Error;
 use std::marker::PhantomData;
 
 pub struct ExtSortedIterator<T, R, W> {
@@ -31,7 +30,7 @@ where
     R: Read,
     W: Write,
 {
-    type Item = Result<T, Box<dyn Error>>;
+    type Item = Result<T, T::Error>;
 
     ///
     /// # Errors

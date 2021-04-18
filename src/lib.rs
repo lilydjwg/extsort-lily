@@ -1,6 +1,5 @@
 use std::collections::BinaryHeap;
 use std::cmp::Reverse;
-use std::error::Error;
 use std::fs::{File, OpenOptions};
 use std::io::{BufReader, BufWriter, self};
 use std::marker::PhantomData;
@@ -12,8 +11,9 @@ use tempdir::TempDir;
 mod iter;
 
 pub trait ExternallySortable<W: Write, R: Read>: Ord + Sized {
-  fn serialize(&self, w: &mut W) -> Result<(), Box<dyn Error>>;
-  fn deserialize(r: &mut R) -> Option<Result<Self, Box<dyn Error>>>;
+  type Error;
+  fn serialize(&self, w: &mut W) -> Result<(), Self::Error>;
+  fn deserialize(r: &mut R) -> Option<Result<Self, Self::Error>>;
 }
 
 pub struct ExternalSorter<T> {
@@ -25,6 +25,7 @@ pub struct ExternalSorter<T> {
 impl<T> ExternalSorter<T>
 where
     T: ExternallySortable<BufWriter<File>, BufReader<File>>,
+    T::Error: From<io::Error>,
 {
   pub fn new(buffer_n_items: usize) -> io::Result<Self> {
     Ok(ExternalSorter {
@@ -46,7 +47,7 @@ where
 
   pub fn sort<I>(
     &self, unsorted: I,
-  ) -> Result<iter::ExtSortedIterator<T, BufReader<File>, BufWriter<File>>, Box<dyn Error>>
+  ) -> Result<iter::ExtSortedIterator<T, BufReader<File>, BufWriter<File>>, T::Error>
   where
       I: Iterator<Item = T>,
   {
@@ -97,7 +98,7 @@ where
     ))
   }
 
-  fn write_chunk(&self, file: &Path, chunk: &mut Vec<T>) -> Result<(), Box<dyn Error>> {
+  fn write_chunk(&self, file: &Path, chunk: &mut Vec<T>) -> Result<(), T::Error> {
     let new_file = OpenOptions::new().create(true).write(true).truncate(true).open(file)?;
     let mut w = BufWriter::new(new_file);
     for s in chunk {
