@@ -2,7 +2,7 @@ use std::io::{Read, Write, Error};
 
 use rand;
 
-use extsort_lily::{ExternalSorter, Sortable};
+use extsort_lily::{ExtSorter, Sortable};
 
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
 struct Num {
@@ -52,7 +52,7 @@ fn sort() {
     Num::new(4),
     Num::new(5),
   ];
-  let iter = ExternalSorter::new(2).unwrap()
+  let iter = ExtSorter::new(2).unwrap()
     .sort(unsorted.into_iter())
     .unwrap();
     for (idx, i) in iter.enumerate() {
@@ -76,7 +76,7 @@ fn zero_buff() {
     Num::new(4),
     Num::new(5),
   ];
-  let iter = ExternalSorter::new(0).unwrap()
+  let iter = ExtSorter::new(0).unwrap()
     .sort(unsorted.into_iter())
     .unwrap();
     for (idx, i) in iter.enumerate() {
@@ -100,7 +100,7 @@ fn large_buff() {
     Num::new(4),
     Num::new(5),
   ];
-  let iter = ExternalSorter::new(999999999).unwrap()
+  let iter = ExtSorter::new(999999999).unwrap()
     .sort(unsorted.into_iter())
     .unwrap();
     for (idx, i) in iter.enumerate() {
@@ -124,13 +124,13 @@ fn reuse() {
     Num::new(4),
     Num::new(5),
   ];
-  let iter = ExternalSorter::new(2).unwrap()
+  let iter = ExtSorter::new(2).unwrap()
     .sort(unsorted.clone().into_iter())
     .unwrap();
     for (idx, i) in iter.enumerate() {
       assert_eq!(i.unwrap().the_num, sorted[idx].the_num);
     }
-    let iter2 = ExternalSorter::new(2).unwrap()
+    let iter2 = ExtSorter::new(2).unwrap()
       .sort(unsorted.into_iter())
       .unwrap();
     for (idx, i) in iter2.enumerate() {
@@ -144,7 +144,7 @@ fn large() {
   for _ in 0..10_000 {
     unsorted.push(Num::new(rand::random()));
   }
-  let iter = ExternalSorter::new(100).unwrap()
+  let iter = ExtSorter::new(100).unwrap()
     .sort(unsorted.into_iter())
     .unwrap();
     let mut last = 0;

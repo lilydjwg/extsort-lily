@@ -1,6 +1,6 @@
 use std::io::{Read, Write, Error};
 
-use extsort_lily::{ExternalSorter, Sortable};
+use extsort_lily::{ExtSorter, Sortable};
 
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
 struct Num {
@@ -49,7 +49,7 @@ fn main() -> Result<(), Error> {
     Num::new(4),
     Num::new(5),
   ];
-  let iter = ExternalSorter::new(2)?
+  let iter = ExtSorter::new(2)?
     .sort(unsorted.into_iter()).unwrap();
   for (idx, i) in iter.enumerate() {
     assert_eq!(i?.the_num, sorted[idx].the_num);

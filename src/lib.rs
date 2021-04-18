@@ -1,7 +1,7 @@
 //! An efficient external sort implementation.
 //!
 //! You start by implementing the [`Sortable`] for your data, and provide your data via an
-//! iterable. Then you create a [`ExternalSorter`] to sort data.
+//! iterable. Then you create an [`ExtSorter`] to sort data.
 //!
 //! An example is provided in the `examples/` directory.
 
@@ -17,23 +17,23 @@ mod iter;
 pub use iter::{ExtSortedIterator, Sortable};
 
 /// Sort the data
-pub struct ExternalSorter<T> {
+pub struct ExtSorter<T> {
   buffer_n_items: usize,
   tmp_dir: TempDir,
   phantom: PhantomData<T>,
 }
 
-impl<T> ExternalSorter<T>
+impl<T> ExtSorter<T>
 where
     T: Sortable<BufWriter<File>, BufReader<File>>,
     T::Error: From<io::Error>,
 {
-  /// Create an `ExternalSorter` to sort your data.
+  /// Create an `ExtSorter` to sort your data.
   ///
   /// It will buffer `buffer_n_items` items in memory and sort them, and then write them serialized
   /// into temporary files.
   pub fn new(buffer_n_items: usize) -> io::Result<Self> {
-    Ok(ExternalSorter {
+    Ok(ExtSorter {
       buffer_n_items,
       tmp_dir: TempDir::new("extsort_lily")?,
       phantom: PhantomData,
@@ -44,7 +44,7 @@ where
   pub fn new_in<P: AsRef<Path>>(
     buffer_n_items: usize, tmp_dir: P,
   ) -> io::Result<Self> {
-    Ok(ExternalSorter {
+    Ok(ExtSorter {
       buffer_n_items,
       tmp_dir: TempDir::new_in(tmp_dir, "extsort_lily")?,
       phantom: PhantomData,
