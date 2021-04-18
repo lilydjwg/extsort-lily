@@ -1,0 +1,16 @@
+[package]
+name = "extsort"
+version = "0.1.0"
+edition = "2018"
+authors = ["lilydjwg <lilydjwg@gmail.com>"]
+license = "MIT"
+keywords = ["sort", "external", "merge", "mergesort"]
+categories = ["algorithms"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+tempdir = "0.3"
+
+[dev-dependencies]
+rand = "0.4"
