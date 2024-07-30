@@ -10,7 +10,7 @@ use std::io::{BufReader, BufWriter, self};
 use std::marker::PhantomData;
 use std::path::Path;
 
-use tempdir::TempDir;
+use tempfile::{Builder, TempDir};
 
 mod iter;
 
@@ -35,7 +35,7 @@ where
   pub fn new(buffer_n_items: usize) -> io::Result<Self> {
     Ok(ExtSorter {
       buffer_n_items,
-      tmp_dir: TempDir::new("extsort_lily")?,
+      tmp_dir: tempdir(None)?,
       phantom: PhantomData,
     })
   }
@@ -46,7 +46,7 @@ where
   ) -> io::Result<Self> {
     Ok(ExtSorter {
       buffer_n_items,
-      tmp_dir: TempDir::new_in(tmp_dir, "extsort_lily")?,
+      tmp_dir: tempdir(Some(tmp_dir.as_ref()))?,
       phantom: PhantomData,
     })
   }
@@ -106,5 +106,16 @@ where
     }
 
     Ok(())
+  }
+}
+
+fn tempdir(path: Option<&Path>) -> io::Result<TempDir> {
+  let mut builder = Builder::new();
+  builder.prefix("extsort_lily");
+
+  if let Some(p) = path {
+    builder.tempdir_in(p)
+  } else {
+    builder.tempdir()
   }
 }
